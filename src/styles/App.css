@@ -1,0 +1,65 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #1e0033;
+}
+
+.text-small {
+  font-size: 16px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.text-highlight {
+  font-size: 20px;
+  color: #34ebde;
+  text-align: center;
+}
+
+.unique-id {
+  font-size: 28px;
+  color: #ff69eb;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: -1px 1px 10px rgba(0, 0, 0, 0.75);
+  margin-top: 8px;
+  font-family: monospace;
+}
+
+.text-big {
+  font-size: 18px;
+  color: #ff69eb;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: -1px 1px 10px rgba(0, 0, 0, 0.75);
+  margin-top: 20px;
+}
+
+.loader {
+  font-size: 20px;
+  color: #00ff00;
+}
+
+.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #1e0033;
+  color: #fff;
+  font-size: 20px;
+}
+
+.download-info {
+  text-align: center;
+}
