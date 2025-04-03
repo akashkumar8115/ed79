@@ -1,6 +1,6 @@
 // API configuration
-export const BASE_URL = process.env.REACT_APP_API_BASE_URL ;
-export const CUSTOMER_ID = process.env.REACT_APP_CUSTOMER_ID ;
+export const BASE_URL = "https://digital-signage-be-production.up.railway.app";
+export const CUSTOMER_ID = "e6c2b37c72024610b08a4a7dac307693";
 
 // Polling intervals (in milliseconds)
 export const UPDATE_CHECK_INTERVAL = 300000; // 5 minutes
