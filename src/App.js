@@ -8,7 +8,7 @@ import {
   getUniqueIdFromLocalStorage,
   saveScreenCodeToLocalStorage,
   getScreenCodeFromLocalStorage
-  
+
 } from "./utils/storage";
 import {
   generateAlphanumericId,
@@ -275,6 +275,7 @@ const App = () => {
   if (error) {
     return (
       <div className="container error" role="alert">
+        <div className="unique-id">Screen Code: {screenCode}</div>
         <div className="text-highlight">Error: {error}</div>
         <button onClick={handleRetry} className="retry-button">
           Retry

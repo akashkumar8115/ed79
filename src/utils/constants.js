@@ -1,6 +1,6 @@
 // API configuration
-export const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
-export const CUSTOMER_ID = process.env.REACT_APP_CUSTOMER_ID || "e6c2b37c72024610b08a4a7dac307693";
+export const BASE_URL = process.env.REACT_APP_API_BASE_URL ;
+export const CUSTOMER_ID = process.env.REACT_APP_CUSTOMER_ID ;
 
 // Polling intervals (in milliseconds)
 export const UPDATE_CHECK_INTERVAL = 300000; // 5 minutes
