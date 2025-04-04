@@ -84,7 +84,7 @@ export const getAllItemInPlaylist = async (playlistId) => {
   if (!playlistId) {
     throw new Error("Playlist ID is required");
   }
-  
+
   return fetchWithLogs(ENDPOINTS.GET_PLAYLIST_ITEMS, {
     method: "POST",
     body: JSON.stringify({ playlistId }),
@@ -100,7 +100,7 @@ export const getPlaylistItemsForId = async (id) => {
   if (!id) {
     throw new Error("ID is required");
   }
-  
+
   try {
     return await fetchWithLogs(`${ENDPOINTS.GET_PLAYLIST_ITEMS_FOR_ID}/${id}`, {
       method: "GET",
@@ -119,7 +119,7 @@ export const fetchContents = async (screenCode) => {
   if (!screenCode) {
     throw new Error("Screen code is required");
   }
-  
+
   try {
     // Check screen existence
     const screenData = await checkScreenExistence(screenCode);

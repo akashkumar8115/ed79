@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/src",
+            "sourceMapPathOverrides": {
+                "webpack:///src/*": "${webRoot}/*"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug CRA Tests",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+            "args": [
+                "test",
+                "--runInBand",
+                "--no-cache",
+                "--watchAll=false"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "CI": "true"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Current File",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${file}"
+        }
+    ]
+}

@@ -17,7 +17,7 @@ import {
   useIsConnected
 } from "./utils/helpers";
 import {
-  UPDATE_CHECK_INTERVAL,
+  CONTENT_UPDATE_INTERVAL,
   DEFAULTS,
   CONTENT_POLLING_INTERVAL
 } from "./utils/constants";
@@ -37,6 +37,7 @@ const App = () => {
   const [apiResponse, setApiResponse] = useState(null);
   const [error, setError] = useState(null);
   const [screenCode, setScreenCode] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   // Refs
   const contentPollingRef = useRef(null);
@@ -52,6 +53,7 @@ const App = () => {
     try {
       if (!allContent || !Array.isArray(allContent) || allContent.length === 0) {
         console.warn("No content to process");
+        setIsLoading(false);
         return false;
       }
 
@@ -68,13 +70,16 @@ const App = () => {
       if (isDownloadComplete) {
         console.log("Content download complete, saving to localStorage");
         setIdItemsInLocalStorage(allContent, uniqueIdLocal);
+        setIsLoading(false);
         return true;
       }
 
+      setIsLoading(false);
       return false;
     } catch (error) {
       console.error("Error processing content:", error);
       setError(`Failed to process content: ${error.message}`);
+      setIsLoading(false);
       return false;
     }
   }, []);
@@ -105,9 +110,8 @@ const App = () => {
 
         // If no screen code exists, generate one and save it
         if (!storedScreenCode) {
-          // Use the first 8 characters of the uniqueId to ensure they're related
-          // but add some transformation to make it different
-          storedScreenCode = generateAlphanumericId(8);
+          // Generate a new screen code
+          storedScreenCode = generateAlphanumericId(6);
           console.log("Generated new screen code:", storedScreenCode);
           saveScreenCodeToLocalStorage(storedScreenCode);
         } else {
@@ -116,14 +120,20 @@ const App = () => {
 
         // Set the screenCode state
         setScreenCode(storedScreenCode);
+
+        // Even if we don't have data yet, we can show the screen code
+        if (!dataReady && itemData.length === 0) {
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error("Error initializing device identity:", error);
         setError(`Failed to initialize device: ${error.message}`);
+        setIsLoading(false);
       }
     };
 
     initializeDeviceIdentity();
-  }, []);
+  }, [dataReady, itemData.length]);
 
   /**
    * Fetch screen data from API
@@ -131,11 +141,12 @@ const App = () => {
   const fetchScreenData = useCallback(async (isPolling = false) => {
     if (!isOnline) {
       console.log("Device is offline, skipping API fetch");
+      setIsLoading(false);
       return;
     }
-
     if (!screenCode) {
       console.log("No screen code available, skipping API fetch");
+      setIsLoading(false);
       return;
     }
 
@@ -162,37 +173,77 @@ const App = () => {
         case 'content_available':
           // We have content to display
           if (processedResponse.mediaItems && processedResponse.mediaItems.length > 0) {
-            // Process and save content using our permanent uniqueId
-            await onFetchAllContent({
-              allContent: processedResponse.mediaItems,
-              uniqueId: uniqueId
+            // Check if content has changed before updating localStorage
+            const storedItems = getIdItemsDataFromLocalStorage();
+            const hasContentChanged = !storedItems ||
+              storedItems.length !== processedResponse.mediaItems.length ||
+              JSON.stringify(storedItems) !== JSON.stringify(processedResponse.mediaItems);
+
+            if (hasContentChanged) {
+              console.log("Content has changed, updating localStorage");
+              // Process and save content using our permanent uniqueId
+              await onFetchAllContent({
+                allContent: processedResponse.mediaItems,
+                uniqueId: uniqueId
+              });
+            } else {
+              console.log("Content unchanged, keeping existing data");
+              // Just set the data ready state without updating localStorage
+              setItemData(storedItems);
+              setDataReady(true);
+              setIsLoading(false);
+            }
+          } else {
+            // No media items in the response
+            setApiResponse({
+              message: `No content available. Please add content for screen code "${screenCode}" in the admin panel.`
             });
+            setItemData([]);
+            setDataReady(false);
+            setIsLoading(false);
           }
           break;
 
         case 'not_registered':
           // Screen needs to be registered
           setApiResponse({
-            message: "This screen needs to be registered. Please add this screen code in the admin panel."
+            message: `This screen needs to be registered. Please add screen code "${screenCode}" in the admin panel.`
           });
           setItemData([]);
           setDataReady(false);
+          setIsLoading(false);
           break;
 
         case 'no_playlist':
         case 'no_content':
-          // Clear any existing content
+          // Clear any existing content but keep showing screen code
+          setApiResponse({
+            message: `No content available. Please add content for screen code "${screenCode}" in the admin panel.`
+          });
           setItemData([]);
           setDataReady(false);
+          setIsLoading(false);
           break;
 
         case 'unchanged':
-          // No changes needed
+          // No changes needed, keep existing content
           console.log("No changes to content");
+          // Make sure we're showing the stored content
+          const storedItems = getIdItemsDataFromLocalStorage();
+          if (storedItems && storedItems.length > 0) {
+            setItemData(storedItems);
+            setDataReady(true);
+          } else {
+            // If we have no stored items, show the screen code
+            setItemData([]);
+            setDataReady(false);
+          }
+          setIsLoading(false);
           break;
 
         default:
           console.warn("Unknown response status:", processedResponse.status);
+          setIsLoading(false);
       }
 
     } catch (err) {
@@ -203,6 +254,7 @@ const App = () => {
       if (itemData.length > 0) {
         setDataReady(true);
       }
+      setIsLoading(false);
     }
   }, [screenCode, uniqueId, onFetchAllContent, isOnline, itemData.length]);
 
@@ -226,10 +278,13 @@ const App = () => {
         // If we have stored items, use them
         if (storedItems && Array.isArray(storedItems) && storedItems.length > 0) {
           console.log("Loading content from localStorage:", storedItems.length, "items");
-          await onFetchAllContent({
-            allContent: storedItems,
-            uniqueId: uniqueId
-          });
+          setItemData(storedItems);
+          setDataReady(true);
+        } else {
+          // If no stored items, make sure we're showing the screen code
+          setItemData([]);
+          setDataReady(false);
+          setIsLoading(false);
         }
 
         // Always fetch from API on initial load, even if we have stored items
@@ -238,6 +293,7 @@ const App = () => {
       } catch (error) {
         console.error("Error initializing app:", error);
         setError(`Failed to initialize: ${error.message}`);
+        setIsLoading(false);
       } finally {
         isInitialLoadRef.current = false;
       }
@@ -254,22 +310,12 @@ const App = () => {
   }, [fetchScreenData, onFetchAllContent, uniqueId, screenCode]);
 
   /**
-   * Set up regular polling for content updates
+   * Set up regular polling for content updates every 5 seconds
    */
   useInterval(() => {
-    if (isOnline && screenCode) {
-      console.log("Checking for content updates...");
-      fetchScreenData(true);
-    }
-  }, UPDATE_CHECK_INTERVAL);
-
-  /**
-   * Handle retry button click
-   */
-  const handleRetry = useCallback(() => {
-    setError(null);
-    fetchScreenData();
-  }, [fetchScreenData]);
+    console.log("Auto-checking for content updates...");
+    fetchScreenData(true);
+  }, CONTENT_UPDATE_INTERVAL);
 
   // Render error state
   if (error) {
@@ -277,9 +323,6 @@ const App = () => {
       <div className="container error" role="alert">
         <div className="unique-id">Screen Code: {screenCode}</div>
         <div className="text-highlight">Error: {error}</div>
-        <button onClick={handleRetry} className="retry-button">
-          Retry
-        </button>
         <NetworkIndicator />
       </div>
     );
@@ -295,26 +338,20 @@ const App = () => {
     );
   }
 
-  // Render no data state
-  if (dataReady && itemData.length === 0) {
-    return (
-      <div className="no-data" role="status">
-        No content available for display
-        <NetworkIndicator />
-      </div>
-    );
-  }
-
-  // Render loading/registration state
+  // Always show screen code when no data or still loading
   return (
     <div className="container" role="status">
       {!isDownloadDataStarted ? (
         <>
           <div className="text-highlight">
-            {apiResponse?.message || "Initializing..."}
+            {isLoading ? "Initializing..." : (apiResponse?.message || "No content available")}
           </div>
           <div className="unique-id">Screen Code: {screenCode}</div>
-          {/* {uniqueId && <div className="unique-id">Device ID: {uniqueId}</div>} */}
+          {!isLoading && (
+            <div className="text-small">
+              Please add this screen in the admin panel
+            </div>
+          )}
         </>
       ) : (
         <div className="download-info">

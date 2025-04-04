@@ -36,22 +36,22 @@ const MediaSlider = ({ allContent = [] }) => {
   useEffect(() => {
     if (allContent.length > 0) {
       const currentItem = allContent[sequence];
-      
+
       // Skip invalid items
       if (!currentItem || !currentItem.media_url) {
         console.warn("Invalid media item at sequence", sequence);
         setSequence((prev) => (prev + 1) % allContent.length);
         return;
       }
-      
+
       // Get duration from item or use default
       const duration = (currentItem?.length * 1000) || DEFAULTS.MEDIA_DURATION;
-      
+
       // Set timer for next item
       timerRef.current = setTimeout(() => {
         setSequence((prev) => (prev + 1) % allContent.length);
       }, duration);
-      
+
       return () => {
         if (timerRef.current) {
           clearTimeout(timerRef.current);
@@ -81,8 +81,8 @@ const MediaSlider = ({ allContent = [] }) => {
   // Handle media error
   const handleMediaError = useCallback((e) => {
     console.error("Media Error:", e);
-    setError(`Failed to load media: ${e.message || 'Unknown error'}`);
-    
+    setError(`Failed to load media please check your internet connection: ${e.message || 'Unknown error'}`);
+
     // Move to next item if there are multiple
     if (allContent.length > 1) {
       setSequence((prev) => (prev + 1) % allContent.length);
