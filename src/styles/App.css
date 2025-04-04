@@ -24,6 +24,7 @@
   font-size: 20px;
   color: #34ebde;
   text-align: center;
+  align-items: center;
 }
 
 .unique-id {
@@ -88,4 +89,20 @@
 .retry-button:active {
   transform: scale(0.98);
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* rotate */
+.rotate-infinite {
+  transform-origin: center;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }

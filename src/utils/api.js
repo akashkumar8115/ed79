@@ -124,7 +124,7 @@ export const fetchContents = async (screenCode) => {
     // Check screen existence
     const screenData = await checkScreenExistence(screenCode);
     console.log("Screen data:", screenData);
-
+   
     return screenData;
   } catch (err) {
     handleFetchError(err, "Fetching content failed:");
