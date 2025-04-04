@@ -345,14 +345,14 @@ const App = () => {
     <div className="container" role="status">
       {!isDownloadDataStarted ? (
         <>
-          <div className="text-highlight">
+          {/* <div className="text-highlight">
             {isLoading ? "Initializing..." : (apiResponse?.message || "No content available")}
-          </div>
+          </div> */}
 
           <div className="unique-id">{screenCode}</div>
           {!isLoading && (
             <div className="text-small">
-              <div role="progressbar" aria-valuemax="1" aria-valuemin="0" class="relative flex items-center justify-center w-16 h-16">
+              <div role="progressbar" aria-valuemax="1" aria-valuemin="0" class="relative flex items-center justify-center w-10 h-10">
                 <svg class="w-full h-full" viewBox="0 0 32 32">
                   <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 opacity-20" />
                   <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 rotate-infinite" stroke-dasharray="17.6 70.4" />
