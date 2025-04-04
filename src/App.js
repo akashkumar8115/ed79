@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import "./styles/App.css";
-import { fetchContents } from "./utils/api";
 import { checkScreenExistence, processScreenResponse } from './utils/screenService';
 import {
   setIdItemsInLocalStorage,
@@ -18,8 +17,6 @@ import {
 } from "./utils/helpers";
 import {
   CONTENT_UPDATE_INTERVAL,
-  DEFAULTS,
-  CONTENT_POLLING_INTERVAL
 } from "./utils/constants";
 import MediaSlider from "./components/MediaSlider";
 import NetworkIndicator from "./components/NetworkIndicator";
@@ -321,8 +318,8 @@ const App = () => {
   if (error) {
     return (
       <div className="container error" role="alert">
+      
         <div className="unique-id">Screen Code: {screenCode}</div>
-        <div className="text-highlight">Error: {error}</div>
         <NetworkIndicator />
       </div>
     );
