@@ -342,7 +342,7 @@ const App = () => {
 
     if (isOnline && !isScreenNotRegistered) {
       // console.log("Auto-checking for content updates...");
-      fetchScreenData(true);
+      fetchScreenData(false);
     } else if (isScreenNotRegistered) {
       console.log("Screen not registered, skipping content polling");
     }
