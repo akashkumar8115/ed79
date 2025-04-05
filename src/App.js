@@ -256,7 +256,7 @@ const App = () => {
       }
       setIsLoading(false);
     }
-  }, [screenCode, uniqueId, onFetchAllContent, isOnline, itemData.length]);
+  }, [5000]);
 
   /**
    * Load initial data from localStorage or API
