@@ -4,13 +4,18 @@
   box-sizing: border-box;
 }
 
+body {
+  width: 100%;
+  height: 100%;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  height: 100vh !important;
+  width: 100vw !important;
   background-color: #1e0033;
 }
 

@@ -317,12 +317,14 @@ const App = () => {
   // Render error state
   if (error) {
     return (
-      <div className="container error" role="alert">
-        <div role="progressbar" aria-valuemax="1" aria-valuemin="0" class="relative flex items-center justify-center w-10 h-10">
-          <svg class="w-full h-full" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 opacity-20" />
-            <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 rotate-infinite" stroke-dasharray="17.6 70.4" />
-          </svg>
+      <div className="container" role="alert">
+        <div className="text-small">
+          <div role="progressbar" aria-valuemax="1" aria-valuemin="0" class="relative flex items-center justify-center w-10 h-10">
+            <svg class="w-full h-full" viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 opacity-20" />
+              <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 rotate-infinite" stroke-dasharray="17.6 70.4" />
+            </svg>
+          </div>
         </div>
         <div className="unique-id">{screenCode}</div>
         <NetworkIndicator />
@@ -345,9 +347,9 @@ const App = () => {
     <div className="container" role="status">
       {!isDownloadDataStarted ? (
         <>
-          {/* <div className="text-highlight">
+          <div className="text-highlight">
             {isLoading ? "Initializing..." : (apiResponse?.message || "No content available")}
-          </div> */}
+          </div>
 
           {!isLoading && (
             <div className="text-small">
@@ -357,7 +359,7 @@ const App = () => {
                   <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 rotate-infinite" stroke-dasharray="17.6 70.4" />
                 </svg>
               </div>
-              {/* Please add this screen */}
+              Please add this screen
             </div>
           )}
           <div className="unique-id">{screenCode}</div>
@@ -365,8 +367,8 @@ const App = () => {
       ) : (
         <div className="download-info">
           <div className="text-small">Downloading Content...</div>
-          {/* <div className="text-small">Please Wait...</div> */}
-          {/* <div className="text-big">{downloadProgress}</div> */}
+          <div className="text-small">Please Wait...</div>
+          <div className="text-big">{downloadProgress}</div>
         </div>
       )}
       <NetworkIndicator />
