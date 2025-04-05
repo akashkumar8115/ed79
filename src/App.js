@@ -6,8 +6,7 @@ import {
   getIdItemsDataFromLocalStorage,
   getUniqueIdFromLocalStorage,
   saveScreenCodeToLocalStorage,
-  getScreenCodeFromLocalStorage,
-  clearLocalStorage
+  getScreenCodeFromLocalStorage
 } from "./utils/storage";
 import {
   generateAlphanumericId,
@@ -334,17 +333,22 @@ const App = () => {
    * Set up regular polling for content updates
    */
   useInterval(() => {
-    // Only poll if we're online and the screen is registered
-    // (we can infer registration status from apiResponse message)
-    // const isScreenNotRegistered = apiResponse?.message?.includes("Please Add This Screen");
-    const isScreenNotRegistered =
-      apiResponse && apiResponse.message && apiResponse.message.includes("Please Add This Screen");
+    // Get the screen registration status from localStorage
+    const screenRegistrationStatus = localStorage.getItem('screenRegistrationStatus');
+    const lastCheckTime = parseInt(localStorage.getItem('lastScreenCheckTime') || '0', 10);
+    const now = Date.now();
 
-    if (isOnline && !isScreenNotRegistered) {
-      // console.log("Auto-checking for content updates...");
-      fetchScreenData(false);
-    } else if (isScreenNotRegistered) {
-      console.log("Screen not registered, skipping content polling");
+    // Only poll if we're online and either:
+    // 1. The screen is registered, or
+    // 2. We haven't checked in a while (30 seconds)
+    if (isOnline && (
+      screenRegistrationStatus !== 'not_registered' ||
+      (now - lastCheckTime > 30000)
+    )) {
+      console.log("Auto-checking for content updates...");
+      fetchScreenData(true);
+    } else {
+      console.log("Skipping content poll - screen not registered or checked recently");
     }
   }, CONTENT_UPDATE_INTERVAL);
 

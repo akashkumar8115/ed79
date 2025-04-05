@@ -6,7 +6,7 @@ export const CUSTOMER_ID = "e6c2b37c72024610b08a4a7dac307693";
 export const UPDATE_CHECK_INTERVAL = 300000; // 5 minutes
 export const CONTENT_POLLING_INTERVAL = 30000; // 30 seconds
 export const NETWORK_CHECK_INTERVAL = 10000; // 10 seconds
-export const CONTENT_UPDATE_INTERVAL = 10000; // 5 seconds
+export const CONTENT_UPDATE_INTERVAL = 10000; // 10 seconds
 
 // API endpoints
 export const ENDPOINTS = {
@@ -21,12 +21,14 @@ export const STORAGE_KEYS = {
   UNIQUE_ID: "uniqueId",
   ITEMS_DATA: "itemsData",
   SCREEN_CODE: "screenCode",
-  DEVICE_REGISTERED: "deviceRegistered"
-
+  DEVICE_REGISTERED: "deviceRegistered",
+  SCREEN_REGISTRATION_STATUS: "screenRegistrationStatus",
+  LAST_SCREEN_CHECK_TIME: "lastScreenCheckTime"
 };
 
 // Default values
 export const DEFAULTS = {
   // MEDIA_DURATION: 50000, // 5 seconds
-  MAX_POLLING_ATTEMPTS: 30
+  MAX_POLLING_ATTEMPTS: 30,
+  UNREGISTERED_POLL_MULTIPLIER: 3 // Poll 3x less frequently for unregistered screens
 };

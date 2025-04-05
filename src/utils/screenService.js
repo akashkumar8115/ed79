@@ -1,5 +1,5 @@
 // producctio
-import { ENDPOINTS } from './constants';
+import { ENDPOINTS, STORAGE_KEYS,DEFAULTS  } from './constants';
 
 /**
  * Check if a screen exists with the given screen code
@@ -37,6 +37,22 @@ export const checkScreenExistence = async (screenCode) => {
 
     const data = await response.json();
     console.log("Screen check response:", data.message);
+
+    // If screen is not registered, clear local storage
+    if (data.message === "Please Add This Screen") {
+      notScreenExist = true;
+      // Clear item data from localStorage when screen is not registered
+      localStorage.removeItem(STORAGE_KEYS.ITEMS_DATA);
+
+      // Set a flag in localStorage to prevent multiple API calls
+      const lastCheckTime = Date.now();
+      localStorage.setItem('lastScreenCheckTime', lastCheckTime);
+      localStorage.setItem('screenRegistrationStatus', 'not_registered');
+    } else {
+      notScreenExist = false;
+      localStorage.setItem('screenRegistrationStatus', 'registered');
+    }
+
     return data;
   } catch (error) {
     console.error('Error checking screen existence:', error.message);
@@ -59,6 +75,25 @@ export const pollScreenContent = (screenCode, onSuccess, onError, interval = 300
   const checkContent = async () => {
     if (!isPolling) return;
 
+    // Check if we've recently determined the screen is not registered
+    const screenRegistrationStatus = localStorage.getItem('screenRegistrationStatus');
+    const lastCheckTime = parseInt(localStorage.getItem('lastScreenCheckTime') || '0', 10);
+    const now = Date.now();
+
+    // If screen is not registered and we checked recently (within 30 seconds), skip the API call
+    if (screenRegistrationStatus === 'not_registered' && (now - lastCheckTime < 30000)) {
+      console.log("Screen recently found to be not registered, skipping API call");
+      if (onSuccess && typeof onSuccess === 'function') {
+        onSuccess({ message: "Please Add This Screen" });
+      }
+
+      // Still set up the next poll, but with a longer interval
+      if (isPolling) {
+        timeoutId = setTimeout(checkContent, interval * DEFAULTS.UNREGISTERED_POLL_MULTIPLIER);
+      }
+      return;
+    }
+
     try {
       const data = await checkScreenExistence(screenCode);
       if (onSuccess && typeof onSuccess === 'function') {
@@ -70,7 +105,10 @@ export const pollScreenContent = (screenCode, onSuccess, onError, interval = 300
       }
     } finally {
       if (isPolling) {
-        timeoutId = setTimeout(checkContent, interval);
+        // Use a longer interval if screen is not registered
+        const pollingInterval = notScreenExist ?
+          interval * DEFAULTS.UNREGISTERED_POLL_MULTIPLIER : interval;
+        timeoutId = setTimeout(checkContent, pollingInterval);
       }
     }
   };
@@ -102,6 +140,9 @@ export const processScreenResponse = (response) => {
 
   // Handle different message types
   if (response.message === "Please Add This Screen") {
+    // Clear item data from localStorage when screen is not registered
+    localStorage.removeItem(STORAGE_KEYS.ITEMS_DATA);
+
     return {
       status: 'not_registered',
       message: 'Screen not registered. Please add this screen in the admin panel.'
