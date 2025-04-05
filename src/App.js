@@ -6,8 +6,8 @@ import {
   getIdItemsDataFromLocalStorage,
   getUniqueIdFromLocalStorage,
   saveScreenCodeToLocalStorage,
-  getScreenCodeFromLocalStorage
-
+  getScreenCodeFromLocalStorage,
+  clearLocalStorage
 } from "./utils/storage";
 import {
   generateAlphanumericId,
@@ -135,7 +135,19 @@ const App = () => {
   /**
    * Fetch screen data from API
    */
+  // Add this state to track if the screen is registered
+  const [isScreenRegistered, setIsScreenRegistered] = useState(true);
+
+  // Add a ref to track the last poll time
+  const lastPollTimeRef = useRef(0);
   const fetchScreenData = useCallback(async (isPolling = false) => {
+    // Prevent multiple calls within a short time period
+    const now = Date.now();
+    if (isPolling && now - lastPollTimeRef.current < 5000) { // 5 second minimum between polls
+      return;
+    }
+    lastPollTimeRef.current = now;
+
     if (!isOnline) {
       // console.log("Device is offline, skipping API fetch");
       setIsLoading(false);
@@ -144,6 +156,11 @@ const App = () => {
     if (!screenCode) {
       // console.log("No screen code available, skipping API fetch");
       setIsLoading(false);
+      return;
+    }
+    // Skip polling if screen is already known to be not registered
+    if (isPolling && !isScreenRegistered) {
+      console.log("Screen not registered, skipping poll");
       return;
     }
     try {
@@ -167,6 +184,7 @@ const App = () => {
       // Handle different response types
       switch (processedResponse.status) {
         case 'content_available':
+          setIsScreenRegistered(true);
           // We have content to display
           if (processedResponse.mediaItems && processedResponse.mediaItems.length > 0) {
             // Check if content has changed before updating localStorage
@@ -202,9 +220,13 @@ const App = () => {
 
         case 'not_registered':
           // Screen needs to be registered
+          setIsScreenRegistered(false); // Mark as not registered
           setApiResponse({
             message: `This screen needs to be registered. Please add screen code "${screenCode}" in the admin panel.`
           });
+          // Clear item data from localStorage when screen is not registered
+          // localStorage.removeItem(STORAGE_KEYS.ITEMS_DATA);
+          clearLocalStorage()
           setItemData([]);
           setDataReady(false);
           setIsLoading(false);
@@ -256,8 +278,7 @@ const App = () => {
       }
       setIsLoading(false);
     }
-  }, [5000]);
-
+  }, [screenCode, uniqueId, onFetchAllContent, isOnline, itemData.length, isScreenRegistered]);
   /**
    * Load initial data from localStorage or API
    */
