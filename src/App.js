@@ -6,7 +6,8 @@ import {
   getIdItemsDataFromLocalStorage,
   getUniqueIdFromLocalStorage,
   saveScreenCodeToLocalStorage,
-  getScreenCodeFromLocalStorage
+  getScreenCodeFromLocalStorage,
+  clearLocalStorage
 
 } from "./utils/storage";
 import {
@@ -149,6 +150,7 @@ const App = () => {
     if (notScreenExist) {
       console.log("No screen code available once again , skipping API fetch");
       setIsLoading(false);
+      localStorage.clear()
       return;
     }
     try {
