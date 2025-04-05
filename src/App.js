@@ -54,7 +54,7 @@ const App = () => {
         return false;
       }
 
-      console.log("Processing content:", allContent.length, "items");
+      // console.log("Processing content:", allContent.length, "items");
 
       const isDownloadComplete = await downloadItems(
         allContent,
@@ -65,7 +65,7 @@ const App = () => {
       );
 
       if (isDownloadComplete) {
-        console.log("Content download complete, saving to localStorage");
+        // console.log("Content download complete, saving to localStorage");
         setIdItemsInLocalStorage(allContent, uniqueIdLocal);
         setIsLoading(false);
         return true;
@@ -93,10 +93,10 @@ const App = () => {
         // If no uniqueId exists, generate one and save it
         if (!storedUniqueId) {
           storedUniqueId = generateAlphanumericId(12); // Generate a 12-character ID
-          console.log("Generated new unique device ID:", storedUniqueId);
+          // console.log("Generated new unique device ID:", storedUniqueId);
           localStorage.setItem("uniqueId", storedUniqueId);
         } else {
-          console.log("Using existing device ID:", storedUniqueId);
+          // console.log("Using existing device ID:", storedUniqueId);
         }
 
         // Set the uniqueId state
@@ -109,10 +109,10 @@ const App = () => {
         if (!storedScreenCode) {
           // Generate a new screen code
           storedScreenCode = generateAlphanumericId(6);
-          console.log("Generated new screen code:", storedScreenCode);
+          // console.log("Generated new screen code:", storedScreenCode);
           saveScreenCodeToLocalStorage(storedScreenCode);
         } else {
-          console.log("Using existing screen code:", storedScreenCode);
+          // console.log("Using existing screen code:", storedScreenCode);
         }
 
         // Set the screenCode state
@@ -137,12 +137,12 @@ const App = () => {
    */
   const fetchScreenData = useCallback(async (isPolling = false) => {
     if (!isOnline) {
-      console.log("Device is offline, skipping API fetch");
+      // console.log("Device is offline, skipping API fetch");
       setIsLoading(false);
       return;
     }
     if (!screenCode) {
-      console.log("No screen code available, skipping API fetch");
+      // console.log("No screen code available, skipping API fetch");
       setIsLoading(false);
       return;
     }
@@ -158,7 +158,7 @@ const App = () => {
 
       // Process the response
       const processedResponse = processScreenResponse(response);
-      console.log("Processed response:", processedResponse.status);
+      // console.log("Processed response:", processedResponse.status);
 
       setApiResponse({
         message: processedResponse.message
@@ -262,18 +262,18 @@ const App = () => {
       try {
         // Only proceed if we have both uniqueId and screenCode
         if (!uniqueId || !screenCode) {
-          console.log("Waiting for device identity to be established...");
+          // console.log("Waiting for device identity to be established...");
           return;
         }
 
-        console.log("Initializing app with uniqueId:", uniqueId, "and screenCode:", screenCode);
+        // console.log("Initializing app with uniqueId:", uniqueId, "and screenCode:", screenCode);
 
         // Try to get data from localStorage first
         const storedItems = getIdItemsDataFromLocalStorage();
 
         // If we have stored items, use them
         if (storedItems && Array.isArray(storedItems) && storedItems.length > 0) {
-          console.log("Loading content from localStorage:", storedItems.length, "items");
+          // console.log("Loading content from localStorage:", storedItems.length, "items");
           setItemData(storedItems);
           setDataReady(true);
         } else {
@@ -309,7 +309,7 @@ const App = () => {
    * Set up regular polling for content updates every 5 seconds
    */
   useInterval(() => {
-    console.log("Auto-checking for content updates...");
+    // console.log("Auto-checking for content updates...");
     fetchScreenData(true);
   }, CONTENT_UPDATE_INTERVAL);
 
