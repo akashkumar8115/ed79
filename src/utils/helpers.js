@@ -123,7 +123,7 @@ export const useIsConnected = () => {
     const checkConnection = async () => {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         
         const response = await fetch('/favicon.ico', { 
           method: 'HEAD',

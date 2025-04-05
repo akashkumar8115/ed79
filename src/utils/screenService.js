@@ -37,12 +37,6 @@ export const checkScreenExistence = async (screenCode) => {
 
     const data = await response.json();
     console.log("Screen check response:", data.message);
-    if (data.message === "Please Add This Screen") {
-      return notScreenExist;
-    }
-    else {
-      notScreenExist = true;
-    }
     return data;
   } catch (error) {
     console.error('Error checking screen existence:', error.message);
