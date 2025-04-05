@@ -225,8 +225,8 @@ const App = () => {
             message: `This screen needs to be registered. Please add screen code "${screenCode}" in the admin panel.`
           });
           // Clear item data from localStorage when screen is not registered
-          // localStorage.removeItem(STORAGE_KEYS.ITEMS_DATA);
-          clearLocalStorage()
+          localStorage.removeItem(itemData);
+          // clearLocalStorage()
           setItemData([]);
           setDataReady(false);
           setIsLoading(false);
