@@ -6,6 +6,7 @@ import { ENDPOINTS } from './constants';
  * @param {string} screenCode - The screen code to check
  * @returns {Promise<Object>} - Response data
  */
+export let notScreenExist = false;
 export const checkScreenExistence = async (screenCode) => {
   try {
     // Validate input
@@ -35,7 +36,13 @@ export const checkScreenExistence = async (screenCode) => {
     }
 
     const data = await response.json();
-    console.log("Screen check response:", data);
+    console.log("Screen check response:", data.message);
+    if (data.message === "Please Add This Screen") {
+      return notScreenExist;
+    }
+    else {
+      notScreenExist = true;
+    }
     return data;
   } catch (error) {
     console.error('Error checking screen existence:', error.message);

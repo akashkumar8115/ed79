@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import "./styles/App.css";
-import { checkScreenExistence, processScreenResponse } from './utils/screenService';
+import { checkScreenExistence, processScreenResponse, notScreenExist } from './utils/screenService';
 import {
   setIdItemsInLocalStorage,
   getIdItemsDataFromLocalStorage,
@@ -146,7 +146,11 @@ const App = () => {
       setIsLoading(false);
       return;
     }
-
+    if (notScreenExist) {
+      console.log("No screen code available once again , skipping API fetch");
+      setIsLoading(false);
+      return;
+    }
     try {
       setError(null);
 
@@ -359,7 +363,9 @@ const App = () => {
                   <circle cx="16" cy="16" r="14" fill="none" stroke-width="4" class="stroke-green-500 rotate-infinite" stroke-dasharray="17.6 70.4" />
                 </svg>
               </div>
-              Please add this screen
+              <div>
+                Please add this screen
+              </div>
             </div>
           )}
           <div className="unique-id">{screenCode}</div>
